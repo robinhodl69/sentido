@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#F3F2F7">
+  <title>Sentido · IRL MCP para Codex</title>
+  <style>
+    :root{--paper:#F3F2F7;--ink:#16141F;--muted:#6B6880;--line:#E6E4EE;--violet:#6D3BF5;--soft:#EDE7FE;--scale:1;--mono:ui-monospace,"SF Mono",Consolas,monospace}
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--paper);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+    button,a{font:inherit;-webkit-tap-highlight-color:transparent}
+    button{cursor:pointer}
+    button:disabled{cursor:default;opacity:.3}
+    button:focus-visible,a:focus-visible{outline:3px solid var(--violet);outline-offset:5px}
+    button{color:inherit}
+    a{color:inherit;text-decoration:none}
+    [hidden]{display:none!important}
+    h1,h2,h3,p,ol,ul{margin:0}
+    code,pre{font-family:var(--mono)}
+    .deck{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform:translate(-50%,-50%) scale(var(--scale));display:flex;flex-direction:column;padding:28px 44px 22px;gap:25px;transform-origin:center}
+    .topbar{height:62px;display:flex;align-items:center;justify-content:space-between;flex:none;gap:24px}
+    .small-logo{width:132px;display:block}
+    .tabs{display:flex;align-items:center;background:#fff;border:1px solid var(--line);padding:5px;border-radius:999px;gap:3px}
+    .tab{border:0;border-radius:999px;background:transparent;padding:13px 20px;color:var(--muted);font-size:15px;font-weight:500;white-space:nowrap}
+    .tab[aria-selected="true"]{background:var(--violet);color:white}
+    .full{background:transparent;border:1px solid var(--line);width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:25px;line-height:1}
+    .content{flex:1;min-height:0;position:relative}
+    .slide{height:100%;display:flex;flex-direction:column;gap:25px}
+    .slide-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex:none}
+    .eyebrow{font-size:13px;letter-spacing:.12em;font-weight:600;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+    .slide-heading h1{font-size:56px;line-height:1.05;font-weight:650;letter-spacing:-.055em}
+    .subtitle{color:var(--muted);font-size:19px;line-height:1.5;margin-top:12px;max-width:1050px}
+    .body{flex:1;min-height:0}
+    .surface{background:#fff;border:1px solid var(--line);border-radius:22px}
+    .violet{background:var(--violet);color:#fff;border-color:var(--violet)}
+    .violet .eyebrow,.violet .description{color:#E3D9FF}
+    .description{font-size:19px;line-height:1.5;color:var(--muted)}
+    .mono{font-family:var(--mono)}
+    .token{display:inline-flex;align-items:center;padding:7px 11px;border-radius:8px;background:var(--paper);font-family:var(--mono);font-size:14px;color:var(--muted)}
+    .footer{height:36px;flex:none;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:13px}
+    .footer-note{display:flex;align-items:center;gap:20px}
+    .footer-note span+span{border-left:1px solid #D6D2E0;padding-left:20px}
+    .navigation{display:flex;align-items:center;gap:18px}
+    .slide-count{font-family:var(--mono);color:var(--ink);min-width:65px;font-size:13px}
+    .nav-button{width:38px;height:34px;border:1px solid var(--line);background:#fff;border-radius:9px;font-size:20px}
+    .hero{justify-content:center;align-items:center;padding-bottom:35px;gap:46px}
+    .hero-logo{width:1100px;max-width:90%;height:auto;display:block}
+    .powered{display:flex;align-items:baseline;gap:18px;color:var(--muted);font-size:21px}
+    .powered strong{color:var(--ink);font-family:var(--mono);font-size:35px;font-weight:650;letter-spacing:-.06em}
+    .subtabs{display:flex;gap:4px;padding:4px;background:#E8E5EF;border-radius:12px;flex:none}
+    .subtab{border:0;background:transparent;color:var(--muted);padding:10px 18px;font-size:15px;border-radius:9px;font-weight:500}
+    .subtab[aria-selected="true"]{color:var(--ink);background:white}
+    .hardware-view{height:100%;display:flex;flex-direction:column;gap:20px}
+    .equipment-grid{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:20px;flex:1;min-height:0}
+    .component{padding:32px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+    .component h2{font-size:23px;font-weight:550;letter-spacing:-.02em}
+    .component-model{font-size:68px;font-weight:650;letter-spacing:-.065em;line-height:1;margin:auto 0 22px}
+    .component-model small{font-size:38px;font-weight:500;display:block;margin-top:10px;letter-spacing:-.045em}
+    .component .description{font-size:18px;max-width:360px}
+    .component .token{align-self:flex-start;margin-top:22px}
+    .component.violet .token{background:#8358F8;color:#fff}
+    .equipment-base{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;flex:none}
+    .base-item{padding:21px 26px;display:flex;align-items:center;gap:20px}
+    .base-number{font-family:var(--mono);color:var(--violet);font-size:15px}
+    .base-item h3{font-size:18px;font-weight:550;margin-bottom:5px}
+    .base-item p{font-size:15px;color:var(--muted);line-height:1.4}
+    .wiring-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;height:100%}
+    .wiring-card{padding:30px;display:flex;flex-direction:column;min-height:0}
+    .wiring-card h2{font-size:30px;font-weight:600;letter-spacing:-.04em}
+    .wiring-card .description{font-size:17px;margin-top:10px}
+    .wiring-table{width:100%;border-collapse:collapse;text-align:left;margin-top:28px;font-size:17px}
+    .wiring-table th{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:550;padding:0 0 15px;border-bottom:1px solid var(--line)}
+    .wiring-table td{height:58px;border-bottom:1px solid #EFEDF5}
+    .wiring-table tr:last-child td{border:0}
+    .wiring-table td:first-child{font-family:var(--mono);font-weight:600;color:var(--violet)}
+    .wire{display:inline-flex;align-items:center;gap:9px}
+    .wire::before{content:"";display:block;width:8px;height:8px;border-radius:50%;background:var(--wire,#B9B4C5)}
+    .wire-red{--wire:#DD4C55}.wire-green{--wire:#30A46C}.wire-black{--wire:#16141F}
+    .wiring-note{margin-top:auto;padding-top:18px;font-size:15px;line-height:1.5;color:var(--muted);border-top:1px solid var(--line)}
+    .firmware-grid{display:grid;grid-template-columns:1.06fr 1fr;gap:25px;height:100%}
+    .code-window{background:var(--ink);color:#F3F2F7;border-radius:22px;padding:27px 30px;display:flex;flex-direction:column;gap:28px}
+    .code-file{font-family:var(--mono);color:#B9B4CB;font-size:13px;display:flex;justify-content:space-between;padding-bottom:20px;border-bottom:1px solid #393542}
+    .code-window pre{font-size:18px;line-height:1.65;white-space:pre-wrap;tab-size:2;margin:0;letter-spacing:-.02em}
+    .code-comment{color:#938BA8}.code-key{color:#BAA2FF}.code-function{color:#E8E0FF}.code-string{color:#C1D7B5}.code-number{color:#F1BD88}
+    .code-caption{font-size:16px;color:#B9B4CB;line-height:1.5;margin-top:auto}
+    .firmware-details{display:flex;flex-direction:column;gap:0;padding:4px 8px}
+    .timing{display:grid;grid-template-columns:110px 1fr;gap:24px;padding:22px 0;border-bottom:1px solid var(--line)}
+    .timing:first-child{padding-top:0}
+    .timing strong{font-size:42px;letter-spacing:-.055em;font-weight:600;color:var(--violet);line-height:1.15}
+    .timing strong small{font-size:18px;display:block;letter-spacing:0;font-weight:500;margin-top:6px}
+    .timing h2{font-size:22px;font-weight:550;margin-bottom:9px;letter-spacing:-.025em}
+    .timing p{font-size:17px;line-height:1.55;color:var(--muted)}
+    .library-list{margin-top:auto;padding-top:22px;display:flex;gap:7px;flex-wrap:wrap}
+    .library-list span{font-size:13px;color:var(--muted);border:1px solid #DDD8E7;border-radius:6px;padding:6px 9px}
+    .mcp-body{display:grid;grid-template-columns:.9fr 1.2fr;gap:25px;height:100%}
+    .server-panel{padding:34px;display:flex;flex-direction:column;background:var(--violet);color:#fff;border-radius:22px}
+    .server-title{font-size:64px;font-weight:600;letter-spacing:-.055em;line-height:1;margin-top:10px}
+    .server-description{font-size:22px;line-height:1.45;color:#E5DBFF;max-width:390px;margin-top:18px}
+    .endpoint{font-family:var(--mono);font-size:18px;padding:18px 0;margin-top:auto;border-top:1px solid #9876F9;border-bottom:1px solid #9876F9;white-space:nowrap}
+    .server-stack{display:flex;gap:20px;font-size:15px;margin-top:22px;color:#E5DBFF}
+    .tool-groups{display:flex;flex-direction:column;gap:23px;padding:4px 0}
+    .tool-group{display:grid;grid-template-columns:125px 1fr;gap:22px;padding-bottom:23px;border-bottom:1px solid var(--line)}
+    .tool-group:last-child{border:0;padding-bottom:0}
+    .tool-group h2{font-size:21px;font-weight:550;padding-top:7px;letter-spacing:-.025em}
+    .tool-list{display:flex;flex-wrap:wrap;gap:9px}
+    .tool-list code{font-size:14px;line-height:1.25;border:1px solid var(--line);background:#fff;padding:10px 13px;border-radius:9px}
+    .mcp-note{font-size:17px;color:var(--muted);line-height:1.5;margin-top:auto}
+    .connection-layout{display:grid;grid-template-columns:1.14fr .86fr;gap:25px;height:100%}
+    .conversation{padding:28px;display:flex;flex-direction:column;gap:16px}
+    .intent-tabs{display:flex;gap:8px}
+    .intent{font-size:15px;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:10px 18px}
+    .intent[aria-pressed="true"]{color:var(--violet);background:var(--soft);border-color:#D2C1FB}
+    .prompt-label{font-size:13px;color:var(--muted)}
+    .prompt{font-size:32px;font-weight:500;line-height:1.3;letter-spacing:-.035em;max-width:650px;min-height:108px}
+    .tool-response{padding-top:18px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+    .tool-response .tool-list code{color:var(--violet);background:var(--soft);border:0;font-size:15px}
+    .tool-description{font-size:18px;line-height:1.5;color:var(--muted);max-width:610px}
+    .conversation-foot{margin-top:auto;color:var(--muted);font-size:13px;line-height:1.4}
+    .codex-setup{display:flex;flex-direction:column;padding:8px 0}
+    .config-block{background:var(--ink);border-radius:18px;padding:30px;color:#F3F2F7}
+    .config-block .eyebrow{color:#ACA2BE;font-size:12px;margin-bottom:20px}
+    .config-block pre{font-size:17px;line-height:1.8;margin:0;white-space:pre-wrap}
+    .connection-steps{list-style:none;padding:0;margin-top:30px}
+    .connection-steps li{display:flex;align-items:baseline;gap:19px;border-bottom:1px solid var(--line);padding:18px 0;font-size:20px;letter-spacing:-.02em;line-height:1.35}
+    .connection-steps li span{font-family:var(--mono);font-size:13px;color:var(--violet);flex:none}
+    .connection-steps li:last-child{border:0}
+    .dashboard-layout{display:grid;grid-template-columns:300px 1fr;gap:25px;height:100%}
+    .feature-list{padding:0;list-style:none;display:flex;flex-direction:column;height:100%}
+    .feature-list li{padding:20px 0;border-bottom:1px solid var(--line)}
+    .feature-list li:first-child{padding-top:0}
+    .feature-list h2{font-size:23px;font-weight:550;letter-spacing:-.03em;margin-bottom:9px}
+    .feature-list p{color:var(--muted);font-size:17px;line-height:1.5}
+    .dashboard-link{display:inline-flex;align-items:center;justify-content:center;gap:13px;background:var(--violet);color:#fff;font-size:16px;font-weight:500;padding:15px 22px;border-radius:12px;margin-top:auto}
+    .browser-frame{height:100%;border:1px solid #DCD8E6;border-radius:18px;background:#fff;overflow:hidden;display:flex;flex-direction:column}
+    .browser-bar{height:43px;flex:none;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 18px;color:var(--muted);font-family:var(--mono);font-size:11px}
+    .browser-bar span:last-child{font-family:Inter,system-ui,sans-serif}
+    .browser-stage{flex:1;min-height:0;position:relative;overflow:hidden;background:var(--paper)}
+    .browser-frame iframe{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform:translate(-50%,-50%) scale(var(--frame-scale,.5));transform-origin:center;border:0;background:var(--paper)}
+    .browser-offline{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px;text-align:center;background:var(--paper)}
+    .browser-offline h2{font-size:30px;letter-spacing:-.04em;font-weight:550}
+    .browser-offline p{font-size:17px;color:var(--muted);max-width:520px;line-height:1.5}
+    .slide-heading .impact-heading{max-width:1320px;font-size:72px;line-height:1.08;letter-spacing:-.06em;font-weight:600}
+    .impact-heading em{font-style:normal;color:var(--violet)}
+    .impact-layout{display:grid;grid-template-columns:1.1fr 1fr;gap:60px;height:100%}
+    .impact-main{display:flex;flex-direction:column;padding-top:16px}
+    .impact-main .description{font-size:23px;line-height:1.5;max-width:690px}
+    .agent-loop{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:22px 32px}
+    .loop-step{padding-top:15px;border-top:1px solid #D8D3E3}
+    .loop-step .mono{font-size:12px;color:var(--violet)}
+    .loop-step h2{font-size:26px;font-weight:550;letter-spacing:-.035em;margin-top:10px}
+    .loop-step p{color:var(--muted);font-size:16px;line-height:1.45;margin-top:7px}
+    .impact-future{padding:32px;display:flex;flex-direction:column;gap:25px}
+    .impact-future .eyebrow{color:#DCCEFF;margin-bottom:0}
+    .use-case{border-bottom:1px solid #9B7AFA;padding-bottom:21px}
+    .use-case h2{font-size:27px;letter-spacing:-.025em;font-weight:550;margin-bottom:8px}
+    .use-case p{color:#E8DFFF;line-height:1.5;font-size:18px}
+    .mvp-note{font-size:16px;line-height:1.5;color:#E8DFFF;margin-top:auto}
+    .mvp-note strong{font-weight:550;color:#fff}
+    @media print{
+      html,body{overflow:visible;height:auto;background:white}
+      .deck{position:static;transform:none;width:1600px;height:auto;padding:0;display:block}
+      .topbar,.footer{display:none}
+      .content{height:auto}
+      .slide,.slide[hidden]{display:flex!important;page-break-after:always;height:900px;padding:44px;background:var(--paper)}
+      .hero{padding:44px}
+      .slide:last-child{page-break-after:auto}
+      .hardware-view[hidden]{display:none!important}
+      .browser-frame iframe{display:none}
+      .browser-offline{display:flex!important}
+      @page{size:1600px 900px;margin:0}
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-label="Presentación de Sentido">
+    <header class="topbar">
+      <a href="#sentido" aria-label="Volver a la portada"><img class="small-logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjQgMTggMTg3IDQyIiB3aWR0aD0iMTg3IiBoZWlnaHQ9IjQyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9InNlbnRpZG8iPgogIDxwYXRoIGQ9Ik0xNy44OCA1OC42NlExNC40OCA1OC42NiAxMS44IDU3LjZROS4xMSA1Ni41MyA3LjQ4IDU0LjQ2UTUuODUgNTIuMzkgNS42MiA0OS4zOUgxMi4yUTEyLjQyIDUxLjQzIDEzLjg1IDUyLjU1UTE1LjI3IDUzLjY3IDE3Ljc2IDUzLjY3UTIwLjE3IDUzLjY3IDIxLjU1IDUyLjcyUTIyLjkzIDUxLjc3IDIyLjkzIDUwLjI5UTIyLjkzIDQ5LjAzIDIxLjkxIDQ4LjI3UTIwLjkgNDcuNSAxOS4xMyA0Ny4xM0wxNC4zOCA0Ni4xNVExMC4zOSA0NS4zMiA4LjMyIDQzLjI5UTYuMjYgNDEuMjcgNi4yNiAzOC4xMVE2LjI2IDM1LjU2IDcuNjQgMzMuNjNROS4wMiAzMS43IDExLjU1IDMwLjYzUTE0LjA4IDI5LjU1IDE3LjQ5IDI5LjU1UTIwLjg2IDI5LjU1IDIzLjQyIDMwLjY4UTI1Ljk5IDMxLjgyIDI3LjQ1IDMzLjg5UTI4LjkyIDM1Ljk2IDI5IDM4LjgySDIyLjc0UTIyLjcyIDM2Ljk3IDIxLjMxIDM1Ljc0UTE5LjkxIDM0LjUyIDE3LjY0IDM0LjUyUTE1LjQ1IDM0LjUyIDE0LjE4IDM1LjVRMTIuOSAzNi40OCAxMi45IDM3LjlRMTIuOSAzOS4xNSAxMy44OSAzOS45M1ExNC44NyA0MC43MSAxNi42IDQxLjA5TDIxLjYyIDQyLjEzUTI1Ljc3IDQzIDI3LjcyIDQ0Ljg3UTI5LjY3IDQ2Ljc0IDI5LjY3IDQ5Ljc5UTI5LjY3IDUyLjUxIDI4LjE2IDU0LjVRMjYuNjUgNTYuNDkgMjMuOTggNTcuNThRMjEuMzIgNTguNjYgMTcuODggNTguNjZaIE00NS4wMSA1OC42M1E0MC44NCA1OC42MyAzNy43OCA1Ni43N1EzNC43MyA1NC45IDMzLjA3IDUxLjYxUTMxLjQyIDQ4LjMyIDMxLjQyIDQ0LjExUTMxLjQyIDM5Ljg2IDMzLjEyIDM2LjU3UTM0LjgyIDMzLjI3IDM3LjgzIDMxLjRRNDAuODMgMjkuNTIgNDQuNzMgMjkuNTJRNDcuNzUgMjkuNTIgNTAuMiAzMC41N1E1Mi42NSAzMS42MiA1NC40MSAzMy41NlE1Ni4xOCAzNS41IDU3LjEzIDM4LjE1UTU4LjA4IDQwLjggNTguMDggNDQuMDFWNDUuODJIMzQuMDVWNDEuMjNINTQuNzVMNTEuNzcgNDIuNDZRNTEuNzcgNDAuMSA1MC45MiAzOC4zOVE1MC4wNyAzNi42NyA0OC41MiAzNS43NFE0Ni45NyAzNC44IDQ0Ljg0IDM0LjhRNDIuNzMgMzQuOCA0MS4xOCAzNS43NFEzOS42MyAzNi42NyAzOC43OCAzOC4zOVEzNy45MyA0MC4xIDM3LjkzIDQyLjQ2VjQ1LjM1UTM3LjkzIDQ3Ljc0IDM4Ljc4IDQ5LjU2UTM5LjYzIDUxLjM3IDQxLjI0IDUyLjM4UTQyLjg2IDUzLjQgNDUuMTYgNTMuNFE0Ni44MyA1My40IDQ4LjEyIDUyLjg5UTQ5LjQxIDUyLjM5IDUwLjI3IDUxLjQ5UTUxLjEzIDUwLjU5IDUxLjUxIDQ5LjM5SDU3Ljc0UTU3LjIyIDUyLjEyIDU1LjQ0IDU0LjJRNTMuNjUgNTYuMjggNTAuOTYgNTcuNDZRNDguMjcgNTguNjMgNDUuMDEgNTguNjNaIE02Ny43NSA0Mi4yNlY1OEg2MS4wOFYzMC4xNkg2Ny42M1YzNy4yNEg2Ni4zM1E2Ny42NyAzMy41MiA3MC4xMSAzMS41NVE3Mi41NiAyOS41OSA3Ni4xOSAyOS41OVE3OS4xMSAyOS41OSA4MS4zNSAzMC44NVE4My41OCAzMi4xMiA4NC44NSAzNC41N1E4Ni4xMSAzNy4wMiA4Ni4xMSA0MC42MVY1OEg3OS40NVY0MS42NlE3OS40NSAzOC41OSA3Ny45OCAzNy4wMVE3Ni41MSAzNS40MyA3My44MyAzNS40M1E3Mi4wOSAzNS40MyA3MC43MSAzNi4xNFE2OS4zMyAzNi44NiA2OC41NCAzOC4zNlE2Ny43NSAzOS44NyA2Ny43NSA0Mi4yNlogTTEwNS4yMiAzMC4xNlYzNS41MUg4OC4wMVYzMC4xNlpNOTIuODcgMjIuNTZIOTkuNTRWNTAuMDJROTkuNTQgNTEuNDkgMTAwLjE0IDUyLjA3UTEwMC43NSA1Mi42NSAxMDIuMzcgNTIuNjVRMTAzLjAxIDUyLjY1IDEwMy44NSA1Mi42NVExMDQuNjkgNTIuNjUgMTA1LjIyIDUyLjY1VjU4UTEwNC41MiA1OCAxMDMuNDEgNThRMTAyLjI5IDU4IDEwMS4yMSA1OFE5Ni45NCA1OCA5NC45IDU2LjI4UTkyLjg3IDU0LjU2IDkyLjg3IDUwLjk4WiBNMTA3Ljg5IDU4VjMwLjE2SDExNC41NVY1OFpNMTExLjIxIDI2LjAyUTEwOS41MSAyNi4wMiAxMDguMzcgMjQuOTNRMTA3LjIzIDIzLjg0IDEwNy4yMyAyMi4yM1ExMDcuMjMgMjAuNjIgMTA4LjM3IDE5LjU0UTEwOS41MSAxOC40NiAxMTEuMiAxOC40NlExMTIuOTEgMTguNDYgMTE0LjA1IDE5LjU0UTExNS4xOSAyMC42MiAxMTUuMTkgMjIuMjRRMTE1LjE5IDIzLjg0IDExNC4wNSAyNC45M1ExMTIuOTEgMjYuMDIgMTExLjIxIDI2LjAyWiBNMTI5LjcgNTguNTdRMTI2LjA4IDU4LjU3IDEyMy4zNiA1Ni43NFExMjAuNjQgNTQuOTIgMTE5LjE1IDUxLjY1UTExNy42NSA0OC4zOSAxMTcuNjUgNDQuMDZRMTE3LjY1IDM5Ljc3IDExOS4xNiAzNi41MVExMjAuNjcgMzMuMjUgMTIzLjM5IDMxLjQyUTEyNi4xIDI5LjU5IDEyOS42NyAyOS41OVExMzEuNDkgMjkuNTkgMTMzLjA1IDMwLjA5UTEzNC42MiAzMC41OCAxMzUuODggMzEuNThRMTM3LjE1IDMyLjU3IDEzOC4wNCAzNC4xSDEzOC4wOFYxOC43MUgxNDQuNzRWNThIMTM4LjE4VjUzLjc0SDEzOC4xNFExMzcuMjcgNTUuMzYgMTM1Ljk5IDU2LjQzUTEzNC43MSA1Ny41MSAxMzMuMTIgNTguMDRRMTMxLjUzIDU4LjU3IDEyOS43IDU4LjU3Wk0xMzEuMjcgNTNRMTMzLjQ1IDUzIDEzNS4wNiA1MS45UTEzNi42OCA1MC43OSAxMzcuNTYgNDguNzdRMTM4LjQ1IDQ2Ljc2IDEzOC40NSA0NC4wNlExMzguNDUgNDEuMzQgMTM3LjU2IDM5LjM0UTEzNi42OCAzNy4zMyAxMzUuMDYgMzYuMjJRMTMzLjQ1IDM1LjEyIDEzMS4yNyAzNS4xMlExMjkuMjIgMzUuMTIgMTI3LjY3IDM2LjE2UTEyNi4xMSAzNy4yIDEyNS4yNSAzOS4xOFExMjQuMzggNDEuMTcgMTI0LjM4IDQ0LjA2UTEyNC4zOCA0Ni45MyAxMjUuMjUgNDguOTNRMTI2LjExIDUwLjkyIDEyNy42NyA1MS45NlExMjkuMjIgNTMgMTMxLjI3IDUzWiBNMTYxLjU4IDU4LjYzUTE1Ny40OSA1OC42MyAxNTQuMzkgNTYuOFExNTEuMjkgNTQuOTcgMTQ5LjU3IDUxLjdRMTQ3Ljg0IDQ4LjQzIDE0Ny44NCA0NC4xMVExNDcuODQgMzkuNzcgMTQ5LjU3IDM2LjQ5UTE1MS4yOSAzMy4yMSAxNTQuMzkgMzEuMzdRMTU3LjQ5IDI5LjUyIDE2MS41OCAyOS41MlExNjUuNjkgMjkuNTIgMTY4Ljc4IDMxLjM3UTE3MS44NiAzMy4yMSAxNzMuNTkgMzYuNDlRMTc1LjMxIDM5Ljc3IDE3NS4zMSA0NC4xMVExNzUuMzEgNDguNDMgMTczLjU5IDUxLjdRMTcxLjg2IDU0Ljk3IDE2OC43OCA1Ni44UTE2NS42OSA1OC42MyAxNjEuNTggNTguNjNaTTE2MS41OCA1My4wN1ExNjMuNzIgNTMuMDcgMTY1LjI5IDUxLjk5UTE2Ni44NiA1MC45MSAxNjcuNzIgNDguODlRMTY4LjU4IDQ2Ljg3IDE2OC41OCA0NC4xMVExNjguNTggNDEuMzEgMTY3LjcyIDM5LjNRMTY2Ljg2IDM3LjI4IDE2NS4yOSAzNi4xOFExNjMuNzIgMzUuMDggMTYxLjU4IDM1LjA4UTE1OS40NiAzNS4wOCAxNTcuODggMzYuMThRMTU2LjMgMzcuMjcgMTU1LjQ0IDM5LjI5UTE1NC41OCA0MS4zMSAxNTQuNTggNDQuMTFRMTU0LjU4IDQ2Ljg5IDE1NS40NCA0OC45UTE1Ni4zIDUwLjkxIDE1Ny44NyA1MS45OVExNTkuNDQgNTMuMDcgMTYxLjU4IDUzLjA3WiIgZmlsbD0iIzE2MTQxRiIvPgogIDxjaXJjbGUgY3g9IjE4NC41IiBjeT0iNTIiIHI9IjYiIGZpbGw9IiM2RDNCRjUiLz4KPC9zdmc+Cg==" alt="Sentido"></a>
+      <nav class="tabs" role="tablist" aria-label="Secciones de la presentación">
+        <button class="tab" id="tab-sentido" type="button" role="tab" aria-controls="sentido" aria-selected="true">Sentido</button>
+        <button class="tab" id="tab-hardware" type="button" role="tab" aria-controls="hardware" aria-selected="false" tabindex="-1">Hardware</button>
+        <button class="tab" id="tab-firmware" type="button" role="tab" aria-controls="firmware" aria-selected="false" tabindex="-1">Firmware</button>
+        <button class="tab" id="tab-mcp" type="button" role="tab" aria-controls="mcp" aria-selected="false" tabindex="-1">MCP</button>
+        <button class="tab" id="tab-codex" type="button" role="tab" aria-controls="codex" aria-selected="false" tabindex="-1">Codex</button>
+        <button class="tab" id="tab-dashboard" type="button" role="tab" aria-controls="dashboard" aria-selected="false" tabindex="-1">Dashboard</button>
+        <button class="tab" id="tab-impacto" type="button" role="tab" aria-controls="impacto" aria-selected="false" tabindex="-1">Impacto</button>
+      </nav>
+      <button class="full" id="fullscreen" type="button" aria-label="Pantalla completa" title="Pantalla completa (F)">⛶</button>
+    </header>
+
+    <div class="content">
+      <section class="slide hero" id="sentido" role="tabpanel" aria-labelledby="tab-sentido">
+        <img class="hero-logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjQgMTggMTg3IDQyIiB3aWR0aD0iMTg3IiBoZWlnaHQ9IjQyIiByb2xlPSJpbWciIGFyaWEtbGFiZWw9InNlbnRpZG8iPgogIDxwYXRoIGQ9Ik0xNy44OCA1OC42NlExNC40OCA1OC42NiAxMS44IDU3LjZROS4xMSA1Ni41MyA3LjQ4IDU0LjQ2UTUuODUgNTIuMzkgNS42MiA0OS4zOUgxMi4yUTEyLjQyIDUxLjQzIDEzLjg1IDUyLjU1UTE1LjI3IDUzLjY3IDE3Ljc2IDUzLjY3UTIwLjE3IDUzLjY3IDIxLjU1IDUyLjcyUTIyLjkzIDUxLjc3IDIyLjkzIDUwLjI5UTIyLjkzIDQ5LjAzIDIxLjkxIDQ4LjI3UTIwLjkgNDcuNSAxOS4xMyA0Ny4xM0wxNC4zOCA0Ni4xNVExMC4zOSA0NS4zMiA4LjMyIDQzLjI5UTYuMjYgNDEuMjcgNi4yNiAzOC4xMVE2LjI2IDM1LjU2IDcuNjQgMzMuNjNROS4wMiAzMS43IDExLjU1IDMwLjYzUTE0LjA4IDI5LjU1IDE3LjQ5IDI5LjU1UTIwLjg2IDI5LjU1IDIzLjQyIDMwLjY4UTI1Ljk5IDMxLjgyIDI3LjQ1IDMzLjg5UTI4LjkyIDM1Ljk2IDI5IDM4LjgySDIyLjc0UTIyLjcyIDM2Ljk3IDIxLjMxIDM1Ljc0UTE5LjkxIDM0LjUyIDE3LjY0IDM0LjUyUTE1LjQ1IDM0LjUyIDE0LjE4IDM1LjVRMTIuOSAzNi40OCAxMi45IDM3LjlRMTIuOSAzOS4xNSAxMy44OSAzOS45M1ExNC44NyA0MC43MSAxNi42IDQxLjA5TDIxLjYyIDQyLjEzUTI1Ljc3IDQzIDI3LjcyIDQ0Ljg3UTI5LjY3IDQ2Ljc0IDI5LjY3IDQ5Ljc5UTI5LjY3IDUyLjUxIDI4LjE2IDU0LjVRMjYuNjUgNTYuNDkgMjMuOTggNTcuNThRMjEuMzIgNTguNjYgMTcuODggNTguNjZaIE00NS4wMSA1OC42M1E0MC44NCA1OC42MyAzNy43OCA1Ni43N1EzNC43MyA1NC45IDMzLjA3IDUxLjYxUTMxLjQyIDQ4LjMyIDMxLjQyIDQ0LjExUTMxLjQyIDM5Ljg2IDMzLjEyIDM2LjU3UTM0LjgyIDMzLjI3IDM3LjgzIDMxLjRRNDAuODMgMjkuNTIgNDQuNzMgMjkuNTJRNDcuNzUgMjkuNTIgNTAuMiAzMC41N1E1Mi42NSAzMS42MiA1NC40MSAzMy41NlE1Ni4xOCAzNS41IDU3LjEzIDM4LjE1UTU4LjA4IDQwLjggNTguMDggNDQuMDFWNDUuODJIMzQuMDVWNDEuMjNINTQuNzVMNTEuNzcgNDIuNDZRNTEuNzcgNDAuMSA1MC45MiAzOC4zOVE1MC4wNyAzNi42NyA0OC41MiAzNS43NFE0Ni45NyAzNC44IDQ0Ljg0IDM0LjhRNDIuNzMgMzQuOCA0MS4xOCAzNS43NFEzOS42MyAzNi42NyAzOC43OCAzOC4zOVEzNy45MyA0MC4xIDM3LjkzIDQyLjQ2VjQ1LjM1UTM3LjkzIDQ3Ljc0IDM4Ljc4IDQ5LjU2UTM5LjYzIDUxLjM3IDQxLjI0IDUyLjM4UTQyLjg2IDUzLjQgNDUuMTYgNTMuNFE0Ni44MyA1My40IDQ4LjEyIDUyLjg5UTQ5LjQxIDUyLjM5IDUwLjI3IDUxLjQ5UTUxLjEzIDUwLjU5IDUxLjUxIDQ5LjM5SDU3Ljc0UTU3LjIyIDUyLjEyIDU1LjQ0IDU0LjJRNTMuNjUgNTYuMjggNTAuOTYgNTcuNDZRNDguMjcgNTguNjMgNDUuMDEgNTguNjNaIE02Ny43NSA0Mi4yNlY1OEg2MS4wOFYzMC4xNkg2Ny42M1YzNy4yNEg2Ni4zM1E2Ny42NyAzMy41MiA3MC4xMSAzMS41NVE3Mi41NiAyOS41OSA3Ni4xOSAyOS41OVE3OS4xMSAyOS41OSA4MS4zNSAzMC44NVE4My41OCAzMi4xMiA4NC44NSAzNC41N1E4Ni4xMSAzNy4wMiA4Ni4xMSA0MC42MVY1OEg3OS40NVY0MS42NlE3OS40NSAzOC41OSA3Ny45OCAzNy4wMVE3Ni41MSAzNS40MyA3My44MyAzNS40M1E3Mi4wOSAzNS40MyA3MC43MSAzNi4xNFE2OS4zMyAzNi44NiA2OC41NCAzOC4zNlE2Ny43NSAzOS44NyA2Ny43NSA0Mi4yNlogTTEwNS4yMiAzMC4xNlYzNS41MUg4OC4wMVYzMC4xNlpNOTIuODcgMjIuNTZIOTkuNTRWNTAuMDJROTkuNTQgNTEuNDkgMTAwLjE0IDUyLjA3UTEwMC43NSA1Mi42NSAxMDIuMzcgNTIuNjVRMTAzLjAxIDUyLjY1IDEwMy44NSA1Mi42NVExMDQuNjkgNTIuNjUgMTA1LjIyIDUyLjY1VjU4UTEwNC41MiA1OCAxMDMuNDEgNThRMTAyLjI5IDU4IDEwMS4yMSA1OFE5Ni45NCA1OCA5NC45IDU2LjI4UTkyLjg3IDU0LjU2IDkyLjg3IDUwLjk4WiBNMTA3Ljg5IDU4VjMwLjE2SDExNC41NVY1OFpNMTExLjIxIDI2LjAyUTEwOS41MSAyNi4wMiAxMDguMzcgMjQuOTNRMTA3LjIzIDIzLjg0IDEwNy4yMyAyMi4yM1ExMDcuMjMgMjAuNjIgMTA4LjM3IDE5LjU0UTEwOS41MSAxOC40NiAxMTEuMiAxOC40NlExMTIuOTEgMTguNDYgMTE0LjA1IDE5LjU0UTExNS4xOSAyMC42MiAxMTUuMTkgMjIuMjRRMTE1LjE5IDIzLjg0IDExNC4wNSAyNC45M1ExMTIuOTEgMjYuMDIgMTExLjIxIDI2LjAyWiBNMTI5LjcgNTguNTdRMTI2LjA4IDU4LjU3IDEyMy4zNiA1Ni43NFExMjAuNjQgNTQuOTIgMTE5LjE1IDUxLjY1UTExNy42NSA0OC4zOSAxMTcuNjUgNDQuMDZRMTE3LjY1IDM5Ljc3IDExOS4xNiAzNi41MVExMjAuNjcgMzMuMjUgMTIzLjM5IDMxLjQyUTEyNi4xIDI5LjU5IDEyOS42NyAyOS41OVExMzEuNDkgMjkuNTkgMTMzLjA1IDMwLjA5UTEzNC42MiAzMC41OCAxMzUuODggMzEuNThRMTM3LjE1IDMyLjU3IDEzOC4wNCAzNC4xSDEzOC4wOFYxOC43MUgxNDQuNzRWNThIMTM4LjE4VjUzLjc0SDEzOC4xNFExMzcuMjcgNTUuMzYgMTM1Ljk5IDU2LjQzUTEzNC43MSA1Ny41MSAxMzMuMTIgNTguMDRRMTMxLjUzIDU4LjU3IDEyOS43IDU4LjU3Wk0xMzEuMjcgNTNRMTMzLjQ1IDUzIDEzNS4wNiA1MS45UTEzNi42OCA1MC43OSAxMzcuNTYgNDguNzdRMTM4LjQ1IDQ2Ljc2IDEzOC40NSA0NC4wNlExMzguNDUgNDEuMzQgMTM3LjU2IDM5LjM0UTEzNi42OCAzNy4zMyAxMzUuMDYgMzYuMjJRMTMzLjQ1IDM1LjEyIDEzMS4yNyAzNS4xMlExMjkuMjIgMzUuMTIgMTI3LjY3IDM2LjE2UTEyNi4xMSAzNy4yIDEyNS4yNSAzOS4xOFExMjQuMzggNDEuMTcgMTI0LjM4IDQ0LjA2UTEyNC4zOCA0Ni45MyAxMjUuMjUgNDguOTNRMTI2LjExIDUwLjkyIDEyNy42NyA1MS45NlExMjkuMjIgNTMgMTMxLjI3IDUzWiBNMTYxLjU4IDU4LjYzUTE1Ny40OSA1OC42MyAxNTQuMzkgNTYuOFExNTEuMjkgNTQuOTcgMTQ5LjU3IDUxLjdRMTQ3Ljg0IDQ4LjQzIDE0Ny44NCA0NC4xMVExNDcuODQgMzkuNzcgMTQ5LjU3IDM2LjQ5UTE1MS4yOSAzMy4yMSAxNTQuMzkgMzEuMzdRMTU3LjQ5IDI5LjUyIDE2MS41OCAyOS41MlExNjUuNjkgMjkuNTIgMTY4Ljc4IDMxLjM3UTE3MS44NiAzMy4yMSAxNzMuNTkgMzYuNDlRMTc1LjMxIDM5Ljc3IDE3NS4zMSA0NC4xMVExNzUuMzEgNDguNDMgMTczLjU5IDUxLjdRMTcxLjg2IDU0Ljk3IDE2OC43OCA1Ni44UTE2NS42OSA1OC42MyAxNjEuNTggNTguNjNaTTE2MS41OCA1My4wN1ExNjMuNzIgNTMuMDcgMTY1LjI5IDUxLjk5UTE2Ni44NiA1MC45MSAxNjcuNzIgNDguODlRMTY4LjU4IDQ2Ljg3IDE2OC41OCA0NC4xMVExNjguNTggNDEuMzEgMTY3LjcyIDM5LjNRMTY2Ljg2IDM3LjI4IDE2NS4yOSAzNi4xOFExNjMuNzIgMzUuMDggMTYxLjU4IDM1LjA4UTE1OS40NiAzNS4wOCAxNTcuODggMzYuMThRMTU2LjMgMzcuMjcgMTU1LjQ0IDM5LjI5UTE1NC41OCA0MS4zMSAxNTQuNTggNDQuMTFRMTU0LjU4IDQ2Ljg5IDE1NS40NCA0OC45UTE1Ni4zIDUwLjkxIDE1Ny44NyA1MS45OVExNTkuNDQgNTMuMDcgMTYxLjU4IDUzLjA3WiIgZmlsbD0iIzE2MTQxRiIvPgogIDxjaXJjbGUgY3g9IjE4NC41IiBjeT0iNTIiIHI9IjYiIGZpbGw9IiM2RDNCRjUiLz4KPC9zdmc+Cg==" alt="sentido.">
+        <p class="powered">powered by <strong>CODEX</strong></p>
+      </section>
+
+      <section class="slide" id="hardware" role="tabpanel" aria-labelledby="tab-hardware" hidden>
+        <div class="slide-heading">
+          <div><h1>Hardware</h1><p class="subtitle">Un dispositivo que mide el ambiente y recibe instrucciones.</p></div>
+          <div class="subtabs" role="tablist" aria-label="Detalle del hardware">
+            <button class="subtab" id="tab-equipo" type="button" role="tab" aria-controls="equipo" aria-selected="true">Equipo</button>
+            <button class="subtab" id="tab-cableado" type="button" role="tab" aria-controls="cableado" aria-selected="false" tabindex="-1">Cableado</button>
+          </div>
+        </div>
+        <div class="body">
+          <div class="hardware-view" id="equipo" role="tabpanel" aria-labelledby="tab-equipo">
+            <div class="equipment-grid">
+              <article class="surface component">
+                <p class="eyebrow">El cerebro</p><h2>Espressif</h2>
+                <p class="component-model">ESP32<small>S3-DevKitC-1</small></p>
+                <p class="description">Montada en el protoboard, con el USB hacia arriba. Lee el sensor y se comunica por Wi-Fi.</p>
+                <span class="token">Microcontrolador</span>
+              </article>
+              <article class="surface component violet">
+                <p class="eyebrow">El sensor</p><h2>Steren ARD-360</h2>
+                <p class="component-model">DHT11</p>
+                <p class="description">Mide temperatura y humedad. Cada lectura viene del ambiente físico.</p>
+                <span class="token">DATA · GPIO4</span>
+              </article>
+              <article class="surface component">
+                <p class="eyebrow">La pantalla</p><h2>OLED de 0.96″</h2>
+                <p class="component-model">128 × 64<small>SSD1306</small></p>
+                <p class="description">Muestra las lecturas y los mensajes de Codex. El LED RGB de la placa también recibe órdenes.</p>
+                <span class="token">I2C · SDA 8 / SCL 9</span>
+              </article>
+            </div>
+            <div class="equipment-base">
+              <article class="surface base-item"><span class="base-number">01</span><div><h3>Protoboard</h3><p>La base del montaje, sin soldar.</p></div></article>
+              <article class="surface base-item"><span class="base-number">02</span><div><h3>Cables jumper</h3><p>Conectan alimentación y señales.</p></div></article>
+              <article class="surface base-item"><span class="base-number">03</span><div><h3>Cable USB</h3><p>Alimenta y programa la ESP32.</p></div></article>
+            </div>
+          </div>
+          <div class="hardware-view" id="cableado" role="tabpanel" aria-labelledby="tab-cableado" hidden>
+            <div class="wiring-grid">
+              <article class="surface wiring-card">
+                <p class="eyebrow">Sensor</p><h2>DHT11</h2>
+                <p class="description">Cuatro pines en A1 a A4. Los cables salen de la fila E.</p>
+                <table class="wiring-table"><thead><tr><th>Conexión</th><th>Pin del sensor</th><th>Destino en ESP32</th></tr></thead><tbody>
+                  <tr><td>E1</td><td><span class="wire wire-red">1 · VCC</span></td><td>3V3 · cable rojo</td></tr>
+                  <tr><td>E2</td><td><span class="wire wire-green">2 · DATA</span></td><td>GPIO4 · cable verde</td></tr>
+                  <tr><td>E3</td><td><span class="wire">3 · sin uso</span></td><td>Vacío</td></tr>
+                  <tr><td>E4</td><td><span class="wire wire-black">4 · GND</span></td><td>G · cable negro</td></tr>
+                </tbody></table>
+                <p class="wiring-note">El firmware activa el pull-up interno en GPIO4. G es la conexión a tierra de la tarjeta.</p>
+              </article>
+              <article class="surface wiring-card">
+                <p class="eyebrow">Pantalla</p><h2>OLED SSD1306</h2>
+                <p class="description">Cuatro pines en F20 a F23, uno por fila. Los cables salen de la columna G.</p>
+                <table class="wiring-table"><thead><tr><th>Pin OLED</th><th>Cable desde</th><th>Señal</th><th>Destino ESP32</th></tr></thead><tbody>
+                  <tr><td>F20</td><td>G20</td><td>GND</td><td>G · tierra</td></tr>
+                  <tr><td>F21</td><td>G21</td><td>VCC</td><td>El otro 3V3</td></tr>
+                  <tr><td>F22</td><td>G22</td><td>SCL</td><td>GPIO9</td></tr>
+                  <tr><td>F23</td><td>G23</td><td>SDA</td><td>GPIO8</td></tr>
+                </tbody></table>
+                <p class="wiring-note">Bus I2C en la dirección 0x3C. El firmware configura SDA en GPIO8 y SCL en GPIO9.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="firmware" role="tabpanel" aria-labelledby="tab-firmware" hidden>
+        <div class="slide-heading"><div><h1>El programa de la tarjeta</h1><p class="subtitle">Un solo archivo Arduino controla el sensor, la pantalla, el LED y la conexión.</p></div><span class="token">C++ / Arduino IDE</span></div>
+        <div class="body firmware-grid">
+          <div class="code-window">
+            <div class="code-file"><span>firmware/sentido/sentido.ino</span><span>.ino</span></div>
+            <pre><code><span class="code-key">void</span> <span class="code-function">loop</span>() {
+  <span class="code-key">unsigned long</span> now = millis();
+  <span class="code-key">if</span> (now - tSensor &gt;= SENSOR_EVERY_MS) {
+    tSensor = now; <span class="code-function">readAndSend</span>();
+  }
+  <span class="code-key">if</span> (now - tCommand &gt;= COMMAND_EVERY_MS) {
+    tCommand = now; <span class="code-function">pollCommand</span>();
+  }
+  <span class="code-comment">// … redibujar pantalla y actualizar LED</span>
+}</code></pre>
+            <p class="code-caption">Extracto del ciclo principal. El archivo también valida las lecturas y reconecta el Wi-Fi.</p>
+          </div>
+          <div class="firmware-details">
+            <article class="timing"><strong>5 s<small>Sensor</small></strong><div><h2>Lectura y envío</h2><p>Lee temperatura y humedad. Valida los valores y los manda a la Mac con <code>POST /ingest</code>, junto con la IP y la señal Wi-Fi.</p></div></article>
+            <article class="timing"><strong>1 s<small>Comandos</small></strong><div><h2>Pantalla y LED</h2><p>Consulta <code>GET /command</code>. Actualiza el mensaje de la OLED y el color del LED RGB cuando hay una instrucción.</p></div></article>
+            <article class="timing"><strong>10 s<small>Reconexión</small></strong><div><h2>Si se pierde el Wi-Fi</h2><p>Reintenta la conexión. Si una lectura del DHT11 es inválida, la descarta y muestra “Sin dato”.</p></div></article>
+            <div class="library-list" aria-label="Librerías del firmware"><span>WiFi</span><span>HTTPClient</span><span>ArduinoJson</span><span>DHT</span><span>Wire</span><span>Adafruit GFX</span><span>Adafruit SSD1306</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="mcp" role="tabpanel" aria-labelledby="tab-mcp" hidden>
+        <div class="slide-heading"><div><h1>El puente es MCP</h1><p class="subtitle">Model Context Protocol convierte las capacidades de Sentido en herramientas para el agente.</p></div><span class="token">13 herramientas</span></div>
+        <div class="body mcp-body">
+          <article class="server-panel">
+            <p class="eyebrow" style="color:#DCCEFF">Servidor local en la Mac</p>
+            <h2 class="server-title">sentido / mcp</h2>
+            <p class="server-description">Recibe las mediciones de la ESP32, guarda el historial y atiende las llamadas de Codex.</p>
+            <p class="endpoint">http://localhost:3000/mcp</p>
+            <div class="server-stack"><span>Node + TypeScript</span><span>Express</span><span>SQLite</span></div>
+          </article>
+          <div class="tool-groups">
+            <article class="tool-group"><h2>Consultar</h2><div class="tool-list"><code>get_current_reading</code><code>get_history</code><code>get_stats</code><code>get_alerts</code><code>get_email_connection</code><code>list_automations</code></div></article>
+            <article class="tool-group"><h2>Actuar</h2><div class="tool-list"><code>show_on_display</code><code>set_led</code></div></article>
+            <article class="tool-group"><h2>Configurar</h2><div class="tool-list"><code>create_automation</code><code>update_automation</code><code>delete_automation</code><code>set_alert</code><code>clear_alert</code></div></article>
+            <p class="mcp-note">El servidor expone MCP por Streamable HTTP. Las lecturas llegan por <code>/ingest</code> y las instrucciones vuelven a la tarjeta por <code>/command</code>.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="codex" role="tabpanel" aria-labelledby="tab-codex" hidden>
+        <div class="slide-heading"><div><h1>Codex consulta y actúa</h1><p class="subtitle">El lenguaje natural se convierte en llamadas a las herramientas del proyecto.</p></div></div>
+        <div class="body connection-layout">
+          <article class="surface conversation">
+            <div class="intent-tabs" role="group" aria-label="Ejemplo de uso con Codex"><button class="intent" type="button" data-intent="read" aria-pressed="true">Consultar</button><button class="intent" type="button" data-intent="email" aria-pressed="false">Avisar</button><button class="intent" type="button" data-intent="act" aria-pressed="false">Actuar</button></div>
+            <p class="prompt-label">Ejemplo de instrucción</p>
+            <div aria-live="polite"><p class="prompt" id="example-prompt">¿Cómo están la temperatura y la humedad?</p></div>
+            <div class="tool-response"><div class="tool-list" id="example-tools"><code>get_current_reading</code></div><p class="tool-description" id="example-description">Codex consulta la medición real, con su hora y antigüedad. Si no hay una lectura reciente, lo informa.</p></div>
+            <p class="conversation-foot" id="example-foot">Los ejemplos describen el uso de las herramientas. No ejecutan acciones desde esta presentación.</p>
+          </article>
+          <div class="codex-setup">
+            <div class="config-block"><p class="eyebrow">Conexión del MCP en Codex</p><pre><code><span class="code-key">[mcp_servers.sentido]</span>
+url = <span class="code-string">"http://localhost:3000/mcp"</span></code></pre></div>
+            <ol class="connection-steps"><li><span>01</span>La ESP32 envía una lectura real.</li><li><span>02</span>Codex obtiene contexto mediante MCP.</li><li><span>03</span>Una instrucción puede cambiar el LED, mostrar un mensaje o crear una regla.</li></ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="dashboard" role="tabpanel" aria-labelledby="tab-dashboard" hidden>
+        <div class="slide-heading"><div><h1>Dashboard</h1><p class="subtitle">Los datos y las automatizaciones, en una sola pantalla.</p></div><span class="token">Next.js / React</span></div>
+        <div class="body dashboard-layout">
+          <div class="feature-list">
+            <article><ul class="feature-list">
+              <li><h2>Lecturas reales</h2><p>Temperatura y humedad. Sin lectura en los últimos 30 s, muestra “Sin dato”.</p></li>
+              <li><h2>Histórico</h2><p>Gráficas separadas, con periodos de 15 min, 1 h, 24 h y 7 días. Datos guardados en SQLite.</p></li>
+              <li><h2>Automatizaciones</h2><p>Reglas compartidas con MCP. Correos por Composio e historial de envíos.</p></li>
+            </ul></article>
+            <a class="dashboard-link" id="open-dashboard" href="/" target="_blank" rel="noopener">Abrir dashboard <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="browser-frame">
+            <div class="browser-bar"><span id="dashboard-address">localhost:3001</span><span>Dashboard del proyecto</span></div>
+            <div class="browser-stage" id="browser-stage">
+              <iframe id="dashboard-frame" title="Dashboard real de Sentido" hidden></iframe>
+              <div class="browser-offline" id="dashboard-offline"><h2>El panel de Sentido</h2><p>Al abrir esta pestaña, la presentación consulta el dashboard local. Los valores solo aparecen si el servidor entrega datos.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" id="impacto" role="tabpanel" aria-labelledby="tab-impacto" hidden>
+        <div class="slide-heading"><div><p class="eyebrow">Impacto</p><h1 class="impact-heading">El <em>mundo real</em> como contexto<br>para procesos agénticos</h1></div></div>
+        <div class="body impact-layout">
+          <div class="impact-main">
+            <p class="description">Sentido conecta una medición física con un agente que puede consultarla y usarla dentro de un proceso.</p>
+            <div class="agent-loop">
+              <article class="loop-step"><span class="mono">01 / MEDICIÓN</span><h2>El entorno aporta datos</h2><p>El sensor observa temperatura y humedad.</p></article>
+              <article class="loop-step"><span class="mono">02 / CONTEXTO</span><h2>El agente puede consultar</h2><p>MCP expone mediciones e historial.</p></article>
+              <article class="loop-step"><span class="mono">03 / DECISIÓN</span><h2>El dato entra al proceso</h2><p>Codex consulta valores y configura reglas.</p></article>
+              <article class="loop-step"><span class="mono">04 / ACCIÓN</span><h2>La instrucción tiene efecto</h2><p>Una regla envía correo. Codex controla OLED y LED.</p></article>
+            </div>
+          </div>
+          <aside class="surface violet impact-future">
+            <p class="eyebrow">Posibles aplicaciones</p>
+            <article class="use-case"><h2>Bodegas y espacios</h2><p>Usar condiciones ambientales para abrir incidencias y avisar a responsables.</p></article>
+            <article class="use-case"><h2>Operaciones con agentes</h2><p>Incorporar señales físicas a revisiones, reportes y flujos de trabajo existentes.</p></article>
+            <p class="mvp-note"><strong>Hoy es un MVP local.</strong> Temperatura, humedad, historial y acciones básicas. Nuevos sensores y actuadores ampliarían lo que el agente puede observar y hacer.</p>
+          </aside>
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-note"><span>IRL MCP para Codex</span><span id="footer-label">Datos del mundo real para agentes</span></div>
+      <div class="navigation"><span>← → para navegar</span><span class="slide-count" id="slide-count" aria-live="polite">01 / 07</span><button class="nav-button" id="previous" type="button" aria-label="Sección anterior" disabled>←</button><button class="nav-button" id="next" type="button" aria-label="Sección siguiente">→</button></div>
+    </footer>
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+      const root = document.documentElement;
+      const fit = () => root.style.setProperty("--scale", Math.min(window.innerWidth / 1600, window.innerHeight / 900));
+      fit();
+      window.addEventListener("resize", fit);
+
+      const tabs = [...document.querySelectorAll(".tabs .tab")];
+      const slides = tabs.map(tab => document.getElementById(tab.getAttribute("aria-controls")));
+      const labels = ["Datos del mundo real para agentes", "El montaje físico", "El código dentro del dispositivo", "Herramientas para el agente", "La conexión con Codex", "Datos y reglas compartidas", "Un MVP con posibilidad de crecer"];
+      const previous = document.getElementById("previous");
+      const next = document.getElementById("next");
+      let current = 0;
+      let dashboardLoaded = false;
+
+      const dashboardUrl = window.location.protocol === "file:" ? "http://localhost:3001/" : new URL("/", window.location.href).href;
+      document.getElementById("open-dashboard").href = dashboardUrl;
+      document.getElementById("dashboard-address").textContent = new URL(dashboardUrl).host;
+      const frameStage = document.getElementById("browser-stage");
+      new ResizeObserver(entries => {
+        const { width, height } = entries[0].contentRect;
+        if (width > 0 && height > 0) frameStage.style.setProperty("--frame-scale", Math.min(width / 1600, height / 900));
+      }).observe(frameStage);
+
+      async function loadDashboard() {
+        if (dashboardLoaded) return;
+        dashboardLoaded = true;
+        const offline = document.getElementById("dashboard-offline");
+        const frame = document.getElementById("dashboard-frame");
+        if (window.location.protocol === "file:") {
+          frame.src = dashboardUrl;
+          frame.hidden = false;
+          offline.hidden = true;
+          return;
+        }
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4000);
+        try {
+          const response = await fetch(new URL("api/status", dashboardUrl), { cache: "no-store", signal: controller.signal });
+          if (!response.ok) throw new Error("Sin conexión");
+          frame.src = dashboardUrl;
+          frame.hidden = false;
+          offline.hidden = true;
+        } catch {
+          offline.querySelector("h2").textContent = "Servidor sin conexión";
+          offline.querySelector("p").textContent = "El dashboard necesita el servidor local encendido. Puedes abrirlo con el botón de la izquierda y volver a intentar esta pestaña.";
+          dashboardLoaded = false;
+        } finally { clearTimeout(timeout); }
+      }
+
+      function show(index, focus = false, updateHash = true) {
+        if (index < 0 || index >= tabs.length) return;
+        current = index;
+        tabs.forEach((tab, i) => {
+          tab.setAttribute("aria-selected", String(i === index));
+          tab.tabIndex = i === index ? 0 : -1;
+          slides[i].hidden = i !== index;
+        });
+        previous.disabled = index === 0;
+        next.disabled = index === tabs.length - 1;
+        document.getElementById("slide-count").textContent = `${String(index + 1).padStart(2, "0")} / ${String(tabs.length).padStart(2, "0")}`;
+        document.getElementById("footer-label").textContent = labels[index];
+        if (focus) tabs[index].focus({ preventScroll: true });
+        if (updateHash) {
+          try { history.replaceState(null, "", `#${slides[index].id}`); } catch { /* file:// puede limitar History API */ }
+        }
+        if (slides[index].id === "dashboard") void loadDashboard();
+      }
+
+      tabs.forEach((tab, index) => tab.addEventListener("click", () => show(index)));
+      previous.addEventListener("click", () => show(current - 1));
+      next.addEventListener("click", () => show(current + 1));
+      document.querySelector(".small-logo").parentElement.addEventListener("click", event => { event.preventDefault(); show(0); });
+
+      function toggleFullScreen() {
+        const action = document.fullscreenElement ? document.exitFullscreen() : root.requestFullscreen?.();
+        if (action && typeof action.catch === "function") action.catch(() => {});
+      }
+      document.getElementById("fullscreen").addEventListener("click", toggleFullScreen);
+      document.addEventListener("fullscreenchange", () => {
+        document.getElementById("fullscreen").setAttribute("aria-label", document.fullscreenElement ? "Salir de pantalla completa" : "Pantalla completa");
+      });
+
+      document.addEventListener("keydown", event => {
+        if (event.altKey || event.ctrlKey || event.metaKey || event.target.closest("input,textarea,select,[contenteditable],.subtabs")) return;
+        if (event.key === "ArrowRight" || event.key === "PageDown") { event.preventDefault(); show(current + 1, true); }
+        if (event.key === "ArrowLeft" || event.key === "PageUp") { event.preventDefault(); show(current - 1, true); }
+        if (event.key === "Home") { event.preventDefault(); show(0, true); }
+        if (event.key === "End") { event.preventDefault(); show(tabs.length - 1, true); }
+        if (event.key.toLowerCase() === "f") { event.preventDefault(); toggleFullScreen(); }
+      });
+
+      const hardwareTabs = [...document.querySelectorAll(".subtab")];
+      function showHardware(index, focus = false) {
+        hardwareTabs.forEach((tab, i) => {
+          tab.setAttribute("aria-selected", String(i === index));
+          tab.tabIndex = i === index ? 0 : -1;
+          document.getElementById(tab.getAttribute("aria-controls")).hidden = i !== index;
+        });
+        if (focus) hardwareTabs[index].focus();
+      }
+      hardwareTabs.forEach((tab, index) => {
+        tab.addEventListener("click", () => showHardware(index));
+        tab.addEventListener("keydown", event => {
+          if (event.key === "ArrowRight" || event.key === "ArrowLeft") { event.preventDefault(); showHardware(1 - index, true); }
+          if (event.key === "Home") { event.preventDefault(); showHardware(0, true); }
+          if (event.key === "End") { event.preventDefault(); showHardware(1, true); }
+        });
+      });
+
+      const examples = {
+        read: {
+          prompt: "¿Cómo están la temperatura y la humedad?",
+          tools: ["get_current_reading"],
+          description: "Codex consulta la medición real, con su hora y antigüedad. Si no hay una lectura reciente, lo informa.",
+        },
+        email: {
+          prompt: "Avísame por correo si la humedad supera el 70 %.",
+          tools: ["get_email_connection", "create_automation"],
+          description: "La regla se guarda en SQLite y aparece en el dashboard. El servidor la evalúa con cada lectura nueva y envía un correo por cruce mediante Composio.",
+        },
+        act: {
+          prompt: "Pon el LED verde y muestra «Hola desde Codex» en la pantalla.",
+          tools: ["set_led", "show_on_display"],
+          description: "El servidor guarda la instrucción. La ESP32 la recibe al consultar /command y actualiza el LED y la OLED.",
+        },
+      };
+      document.querySelectorAll(".intent").forEach(button => button.addEventListener("click", () => {
+        const example = examples[button.dataset.intent];
+        document.querySelectorAll(".intent").forEach(other => other.setAttribute("aria-pressed", String(other === button)));
+        document.getElementById("example-prompt").textContent = example.prompt;
+        document.getElementById("example-description").textContent = example.description;
+        const tools = document.getElementById("example-tools");
+        tools.replaceChildren(...example.tools.map(name => { const code = document.createElement("code"); code.textContent = name; return code; }));
+      }));
+
+      function fromHash() {
+        const index = slides.findIndex(slide => `#${slide.id}` === window.location.hash);
+        show(index < 0 ? 0 : index, false, false);
+      }
+      window.addEventListener("hashchange", fromHash);
+      fromHash();
+    })();
+  </script>
+</body>
+</html>
